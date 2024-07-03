@@ -12,14 +12,14 @@ trait IFundMe<TContractState> {
 
 #[starknet::contract]
 mod FundMe {
+    use core::num::traits::zero::Zero;
     use openzeppelin::token::erc20::interface::{IERC20CamelDispatcher, IERC20CamelDispatcherTrait};
     use starknet::{get_caller_address, get_contract_address};
     use super::{ContractAddress, IFundMe};
-    use core::num::traits::zero::Zero;
 
     const NOT_OWNER: felt252 = 'not owner';
     const ZERO_ADDRESS_CALLER: felt252 = 'Caller is the zero address';
-    
+
     const MINIMUM_USD: u256 = 5000000000000000000; // ONE_ETH_IN_WEI: 5 * 10 ^ 18;
     const ETH_CONTRACT_ADDRESS: felt252 =
         0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7;
@@ -43,7 +43,7 @@ mod FundMe {
     #[storage]
     struct Storage {
         eth_token: IERC20CamelDispatcher,
-        funders: LegacyMap<u256,ContractAddress>,
+        funders: LegacyMap<u256, ContractAddress>,
         funders_length: u256,
         address_to_amount_funded: LegacyMap<ContractAddress, u256>,
         owner: ContractAddress,
@@ -54,7 +54,6 @@ mod FundMe {
         let eth_contract_address = ETH_CONTRACT_ADDRESS.try_into().unwrap();
         self.eth_token.write(IERC20CamelDispatcher { contract_address: eth_contract_address });
         self.owner.write(owner);
-
     }
 
     #[abi(embed_v0)]
@@ -84,7 +83,7 @@ mod FundMe {
             let mut index = 0;
             let mut total_amount = 0;
             let funders_length = self.funders_length.read();
-            while index < funders_length{
+            while index < funders_length {
                 let funder = self.funders.read(index);
                 let amount = self.address_to_amount_funded.read(funder);
                 self.address_to_amount_funded.write(funder, 0);
